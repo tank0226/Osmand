@@ -784,7 +784,7 @@
     <string name="precise_routing_mode">Exakt ruttning (alfa)</string>
     <string name="av_def_action_picture">Ta ett foto</string>
     <string name="dropbox_plugin_description">Dropbox-modulen låter dig synkronisera spår och ljud-/videoanteckningar med ditt Dropbox-konto.</string>
-    <string name="srtm_paid_version_msg">Köp gärna pluginen Höjdkurvor på Market för att stödja fortsatt utveckling.</string>
+    <string name="srtm_paid_version_msg">Köp gärna pluginet Höjdkurvor för att stödja fortsatt utveckling.</string>
     <string name="av_def_action_audio">Spela in ljud</string>
     <string name="av_widget_action_descr">Standardåtgärd för widget:</string>
     <string name="av_widget_action">Standardåtgärd för widget</string>
@@ -889,9 +889,6 @@
     <string name="item_unchecked">ej markerad</string>
     <string name="av_def_action_choose">På förfrågan\?</string>
     <string name="enable_plugin_monitoring_services">Aktivera Trippinspelningspluginen för att använda positionsloggningstjänster (GPX-loggning, online-spårning)</string>
-    <string name="osmand_srtm_long_description_1000_chars">Denna modul erbjuder både ett överlägg med konturlinjer och ett höjdkurvslager som kan visas ovanpå OsmAnds offline-kartor. Denna funktion kommer att uppskattas av idrottsmän, vandrare och alla som är intresserade av höjdskillnader i landskapet.
-\n
-\nDessa globala data (mellan 70 grader norr och 70 grader syd) är baserade på SRTM (Shuttle Radar Topography Mission) och ASTER (Advanced Spaceborne Thermal Emission and Reflection Radiometer), ett bildinstrument på Terra, NASA:s Earth Observing Systems satellit. ASTER är ett samarbete mellan NASA, Japans finansdepartement, Trade and Industry (METI) och Japan Space Systems (J-spacesystems).</string>
     <string name="access_arrival_time">Ankomsttid</string>
     <string name="index_name_openmaps">OpenMaps EU</string>
     <string name="layer_hillshade">Skuggad relief-lager</string>
@@ -1083,7 +1080,7 @@
     <string name="lang_lv">Lettiska</string>
     <string name="lang_lt">Litauiska</string>
     <string name="lang_mr">Marathi</string>
-    <string name="lang_no">Norska</string>
+    <string name="lang_no">Norska Bokmål</string>
     <string name="lang_pl">Polska</string>
     <string name="lang_pt">Portugisiska</string>
     <string name="lang_ro">Rumänska</string>
@@ -1249,7 +1246,7 @@
     <string name="traffic_warning_stop">Stopptecken</string>
     <string name="traffic_warning">Trafikskylt</string>
     <string name="traffic_warning_speed_camera">Fartkamera</string>
-    <string name="traffic_warning_calming">Trafikdämpning</string>
+    <string name="traffic_warning_calming">Farthinder</string>
     <string name="local_index_description">Tryck på en post för att se fler detaljer, tryck och håll för att inaktivera eller ta bort. Data på enheten (%1$s ledigt):</string>
     <string name="text_size_descr">Ange textstorlek på kartan.</string>
     <string name="text_size">Textstorlek</string>
@@ -1597,7 +1594,7 @@
     <string name="plugin_settings">Insticksprogram</string>
     <string name="traffic_warning_hazard">Varning</string>
     <string name="tab_title_basic">Grundläggande</string>
-    <string name="tab_title_advanced">Utökad</string>
+    <string name="tab_title_advanced">Avancerat</string>
     <string name="building_number">Husnummer</string>
     <string name="next_proceed">Nästa</string>
     <string name="opening_at">Öppnar</string>
@@ -2884,8 +2881,8 @@
     <string name="edit_profile_setup_map_subtitle">Välj kartalternativ för profilen</string>
     <string name="edit_profile_screen_options_subtitle">Välj skärmalternativ för profilen</string>
     <string name="edit_profile_nav_settings_subtitle">Välj navigeringsinställningar för profilen</string>
-    <string name="routing_attr_max_num_changes_description">Ange övre gräns för ändringar</string>
-    <string name="routing_attr_max_num_changes_name">Antal ändringar</string>
+    <string name="routing_attr_max_num_changes_description">Ange max gräns för antal byten</string>
+    <string name="routing_attr_max_num_changes_name">Antal byten</string>
     <string name="turn_screen_on_router">Vakna vid kurva</string>
     <string name="turn_screen_on_time_descr">Justera hur länge skärmen ska vara på.</string>
     <string name="turn_screen_on_sensor">Använd närhetssensor</string>
@@ -3070,7 +3067,6 @@
     <string name="ltr_or_rtl_combine_via_dash">%1$s — %2$s</string>
     <string name="ltr_or_rtl_combine_via_star">%1$s * %2$s</string>
     <string name="icon_group_transport">Kollektivtrafik</string>
-    <string name="app_mode_gap">Tomrum</string>
     <string name="icon_group_amenity">bekvämligheter</string>
     <string name="icon_group_special">Speciell</string>
     <string name="icon_group_symbols">Symboler</string>
@@ -3391,7 +3387,6 @@
     <string name="trip_recording_show_start_dialog_setting">Om den är inaktiverad startar inspelningen direkt efter att du har tryckt på widgeten eller menyalternativet och hoppat över bekräftelsedialogrutan.</string>
     <string name="customize_route_line">Anpassa ruttlinjen</string>
     <string name="shared_string_route_line">Ruttlinje</string>
-    <string name="route_line_use_map_style_appearance">Ruttlinje skulle användas %1$s som anges i vald kartstil: %2$s.</string>
     <string name="expired">Upphörd</string>
     <string name="release_4_0_beta">• OsmAnd Live-uppdateringar flyttade till \"Nedladdningar&gt; Uppdateringar\"
 \n
@@ -3407,4 +3402,6 @@
     <string name="announce_when_exceeded">Meddela när den överskrids</string>
     <string name="user_points">Användarpunkter</string>
     <string name="output">Utgång</string>
+    <string name="shared_string_logout">Logga ut</string>
+    <string name="duration_ago">%1$s sedan</string>
 </resources>

@@ -113,7 +113,7 @@ public class MapMarkersActiveFragment extends Fragment implements OsmAndCompassL
 				toPosition = holder.getAdapterPosition();
 				if (toPosition >= 0 && fromPosition >= 0 && toPosition != fromPosition) {
 					hideSnackbar();
-					mapActivity.getMyApplication().getMapMarkersHelper().reorderActiveMarkersIfNeeded();
+					mapActivity.getMyApplication().getMapMarkersHelper().saveMarkersOrder();
 					adapter.notifyDataSetChanged();
 				}
 			}

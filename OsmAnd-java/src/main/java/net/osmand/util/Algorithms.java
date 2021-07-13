@@ -2,8 +2,8 @@ package net.osmand.util;
 
 import net.osmand.IProgress;
 import net.osmand.PlatformUtil;
-import net.osmand.router.RouteColorize;
 import net.osmand.data.LatLon;
+import net.osmand.router.RouteColorize;
 
 import org.apache.commons.logging.Log;
 import org.xmlpull.v1.XmlPullParser;
@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,6 +59,7 @@ public class Algorithms {
 	public static final int BZIP_FILE_SIGNATURE = 0x425a;
 	public static final int GZIP_FILE_SIGNATURE = 0x1f8b;
 
+
 	public static String normalizeSearchText(String s) {
 		boolean norm = false;
 		for (int i = 0; i < s.length() && !norm; i++) {
@@ -84,6 +86,10 @@ public class Algorithms {
 
 	public static String emptyIfNull(String s) {
 		return s == null ? "" : s;
+	}
+
+	public static String trimIfNotNull(String s) {
+		return s == null ? null : s.trim();
 	}
 
 	public static boolean isEmpty(CharSequence s) {
@@ -186,7 +192,10 @@ public class Algorithms {
 	}
 
 	public static String getFileExtension(File f) {
-		String name = f.getName();
+		return getFileNameExtension(f.getName());
+	}
+
+	public static String getFileNameExtension(String name) {
 		int i = name.lastIndexOf(".");
 		return name.substring(i + 1);
 	}
@@ -267,14 +276,14 @@ public class Algorithms {
         };
     }
 
-	private static final char CHAR_TOSPLIT = 0x01;
+	private static final char CHAR_TO_SPLIT = 0x01;
 
 	public static Map<String, String> decodeMap(String s) {
 		if (isEmpty(s)) {
 			return Collections.emptyMap();
 		}
 		Map<String, String> names = new HashMap<String, String>();
-		String[] split = s.split(CHAR_TOSPLIT + "");
+		String[] split = s.split(CHAR_TO_SPLIT + "");
 		// last split is an empty string
 		for (int i = 1; i < split.length; i += 2) {
 			names.put(split[i - 1], split[i]);
@@ -288,9 +297,9 @@ public class Algorithms {
 			StringBuilder bld = new StringBuilder();
 			while (it.hasNext()) {
 				Entry<String, String> e = it.next();
-				bld.append(e.getKey()).append(CHAR_TOSPLIT)
-						.append(e.getValue().replace(CHAR_TOSPLIT, (char) (CHAR_TOSPLIT + 1)));
-				bld.append(CHAR_TOSPLIT);
+				bld.append(e.getKey()).append(CHAR_TO_SPLIT)
+						.append(e.getValue().replace(CHAR_TO_SPLIT, (char) (CHAR_TO_SPLIT + 1)));
+				bld.append(CHAR_TO_SPLIT);
 			}
 			return bld.toString();
 		}
@@ -298,30 +307,45 @@ public class Algorithms {
 	}
 
 	public static Set<String> decodeStringSet(String s) {
+		return decodeStringSet(s, String.valueOf(CHAR_TO_SPLIT));
+	}
+
+	public static Set<String> decodeStringSet(String s, String split) {
 		if (isEmpty(s)) {
 			return Collections.emptySet();
 		}
-		return new HashSet<>(Arrays.asList(s.split(CHAR_TOSPLIT + "")));
+		return new HashSet<>(Arrays.asList(s.split(split)));
 	}
 
-	public static String encodeStringSet(Set<String> set) {
-		if (set != null) {
-			StringBuilder sb = new StringBuilder();
-			for (String s : set) {
-				sb.append(s).append(CHAR_TOSPLIT);
-			}
-			return sb.toString();
+	public static <T> String encodeCollection(Collection<T> collection) {
+		return encodeCollection(collection, String.valueOf(CHAR_TO_SPLIT));
+	}
+
+	public static <T> String encodeCollection(Collection<T> collection, String split) {
+		if (collection == null) {
+			return "";
 		}
-		return "";
+		StringBuilder res = new StringBuilder();
+		Iterator<T> iterator = collection.iterator();
+		while (iterator.hasNext()) {
+			T next = iterator.next();
+			res.append(next);
+			if (iterator.hasNext()) {
+				res.append(split);
+			}
+		}
+		return res.toString();
 	}
 
-	public static int findFirstNumberEndIndex(String value) {
+	public static int findFirstNumberEndIndexLegacy(String value) {
+		// keep this method unmodified ! (to check old clients crashes on server side)
 		int i = 0;
 		boolean valid = false;
 		if (value.length() > 0 && value.charAt(0) == '-') {
 			i++;
 		}
-		while (i < value.length() && (isDigit(value.charAt(i)) || value.charAt(i) == '.')) {
+		while (i < value.length() &&
+				(isDigit(value.charAt(i)) || value.charAt(i) == '.')) {
 			i++;
 			valid = true;
 		}
@@ -330,6 +354,43 @@ public class Algorithms {
 		} else {
 			return -1;
 		}
+	}
+
+	public static int findFirstNumberEndIndex(String value) {
+		int i = 0;
+		if (value.length() > 0 && value.charAt(0) == '-') {
+			i++;
+		}
+		int state = 0; // 0 - no number, 1 - 1st digits, 2 - dot, 3 - last digits
+		while (i < value.length() && (isDigit(value.charAt(i)) || (value.charAt(i) == '.'))) {
+			if (value.charAt(i) == '.') {
+				if (state == 2) {
+					return i - 1;
+				}
+				if (state != 1) {
+					return -1;
+				}
+				state = 2;
+			} else {
+				if (state == 2) {
+					// last digits 
+					state = 3;
+				} else if (state == 0) {
+					// first digits started
+					state = 1;
+				}
+
+			}
+			i++;
+		}
+		if (state == 2) {
+			// invalid number like 40. correct to -> '40'
+			return i - 1;
+		}
+		if (state == 0) {
+			return -1;
+		}
+		return i;
 	}
 
 	public static boolean isDigit(char charAt) {
@@ -575,6 +636,9 @@ public class Algorithms {
 			if (pg != null && cp > bytesDivisor) {
 				pg.progress(cp / bytesDivisor);
 				cp = cp % bytesDivisor;
+				if (pg.isInterrupted()) {
+					throw new InterruptedIOException();
+				}
 			}
 		}
 	}
@@ -1063,29 +1127,41 @@ public class Algorithms {
 		return false;
 	}
 
-	public static int[] stringToGradientPalette(String str) {
+	public static int[] stringToGradientPalette(String str, String gradientScaleType) {
+		boolean isSlope = "gradient_slope_color".equals(gradientScaleType);
 		if (Algorithms.isBlank(str)) {
-			return RouteColorize.colors;
+			return isSlope ? RouteColorize.SLOPE_COLORS : RouteColorize.COLORS;
 		}
 		String[] arr = str.split(" ");
-		if (arr.length != 3) {
-			return RouteColorize.colors;
+		if (arr.length < 2) {
+			return isSlope ? RouteColorize.SLOPE_COLORS : RouteColorize.COLORS;
 		}
-		int[] colors = new int[3];
+		int[] colors = new int[arr.length];
 		try {
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < arr.length; i++) {
 				colors[i] = Algorithms.parseColor(arr[i]);
 			}
 		} catch (IllegalArgumentException e) {
-			return RouteColorize.colors;
+			return isSlope ? RouteColorize.SLOPE_COLORS : RouteColorize.COLORS;
 		}
 		return colors;
 	}
 
-	public static String gradientPaletteToString(int[] colors) {
-		int[] src = (colors != null && colors.length == 3) ? colors : RouteColorize.colors;
-		return Algorithms.colorToString(src[0]) + " " +
-				Algorithms.colorToString(src[1]) + " " +
-				Algorithms.colorToString(src[2]);
+	public static String gradientPaletteToString(int[] palette, String gradientScaleType) {
+		boolean isSlope = "gradient_slope_color".equals(gradientScaleType);
+		int[] src;
+		if (palette != null && palette.length >= 2) {
+			src = palette;
+		} else {
+			src = isSlope ? RouteColorize.SLOPE_COLORS : RouteColorize.COLORS;
+		}
+		StringBuilder stringPalette = new StringBuilder();
+		for (int i = 0; i < src.length; i++) {
+			stringPalette.append(colorToString(src[i]));
+			if (i + 1 != src.length) {
+				stringPalette.append(" ");
+			}
+		}
+		return stringPalette.toString();
 	}
 }

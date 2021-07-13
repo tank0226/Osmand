@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.osmand.binary.BinaryMapRouteReaderAdapter.RouteRegion;
@@ -32,7 +33,12 @@ import net.osmand.router.RoutingContext;
 import net.osmand.router.TransportRoutingConfiguration;
 import net.osmand.util.Algorithms;
 
+import net.osmand.util.MapUtils;
+
 import org.apache.commons.logging.Log;
+
+import static net.osmand.IndexConstants.GPX_FILE_EXT;
+import static net.osmand.IndexConstants.GPX_GZ_FILE_EXT;
 
 public class NativeLibrary {
 
@@ -91,6 +97,23 @@ public class NativeLibrary {
 			if (nativeHandler != 0) {
 				deleteRouteSearchResult(nativeHandler);
 				nativeHandler = 0;
+			}
+		}
+	}
+
+	public static class NativeDirectionPoint {
+		public int x31;
+		public int y31;
+		public String[][] tags;
+		public NativeDirectionPoint(double lat, double lon, Map<String, String> tags) {
+			x31 = MapUtils.get31TileNumberX(lon);
+			y31 = MapUtils.get31TileNumberY(lat);
+			this.tags = new String[tags.size()][2];
+			int i = 0;
+			for (Map.Entry<String, String> e : tags.entrySet()) {
+				this.tags[i][0] = e.getKey();
+				this.tags[i][1] = e.getValue();
+				i++;
 			}
 		}
 	}
@@ -364,18 +387,23 @@ public class NativeLibrary {
 
 	public static class RenderedObject extends MapObject {
 		private Map<String, String> tags = new LinkedHashMap<>();
-		private QuadRect bbox = new QuadRect(); 
+		private QuadRect bbox = new QuadRect();
 		private TIntArrayList x = new TIntArrayList();
 		private TIntArrayList y = new TIntArrayList();
 		private String iconRes;
 		private int order;
 		private boolean visible;
+		private boolean drawOnPath;
 		private LatLon labelLatLon;
 		private int labelX = 0;
 		private int labelY = 0;
-		
+
 		public Map<String, String> getTags() {
 			return tags;
+		}
+
+		public String getTagValue(String tag) {
+			return getTags().get(tag);
 		}
 		
 		public boolean isText() {
@@ -414,31 +442,39 @@ public class NativeLibrary {
 		public void setIconRes(String iconRes) {
 			this.iconRes = iconRes;
 		}
-		
+
 		public void setVisible(boolean visible) {
 			this.visible = visible;
 		}
-		
+
 		public boolean isVisible() {
 			return visible;
 		}
-		
+
+		public void setDrawOnPath(boolean drawOnPath) {
+			this.drawOnPath = drawOnPath;
+		}
+
+		public boolean isDrawOnPath() {
+			return drawOnPath;
+		}
+
 		public TIntArrayList getY() {
 			return y;
 		}
-		
+
 		public void setBbox(int left, int top, int right, int bottom) {
 			bbox = new QuadRect(left, top, right, bottom);
 		}
-		
+
 		public QuadRect getBbox() {
 			return bbox;
 		}
-		
+
 		public void setNativeId(long id) {
 			setId(id);
 		}
-		
+
 		public void putTag(String t, String v) {
 			tags.put(t, v);
 		}
@@ -458,6 +494,38 @@ public class NativeLibrary {
 		public void setLabelY(int labelY) {
 			this.labelY = labelY;
 		}
-	}
 
+		public List<String> getOriginalNames() {
+			List<String> names = new ArrayList<>();
+			if (!Algorithms.isEmpty(name)) {
+				names.add(name);
+			}
+			for (Map.Entry<String, String> entry : tags.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if ((key.startsWith("name:") || key.equals("name")) && !value.isEmpty()) {
+					names.add(value);
+				}
+			}
+			return names;
+		}
+
+		public String getRouteID() {
+			for (Map.Entry<String, String> entry : getTags().entrySet()) {
+				if ("route_id".equals(entry.getKey())) {
+					return entry.getValue();
+				}
+			}
+			return null;
+		}
+
+		public String getGpxFileName() {
+			for (String name : getOriginalNames()) {
+				if (name.endsWith(GPX_FILE_EXT) || name.endsWith(GPX_GZ_FILE_EXT)) {
+					return name;
+				}
+			}
+			return null;
+		}
+	}
 }

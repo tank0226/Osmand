@@ -74,6 +74,7 @@ public class UiUtilities {
 
 	public enum DialogButtonType {
 		PRIMARY,
+		PRIMARY_HARMFUL,
 		SECONDARY,
 		SECONDARY_HARMFUL,
 		STROKED
@@ -213,6 +214,34 @@ public class UiUtilities {
 		// Counting the perceptive luminance - human eye favors green color...
 		double luminance = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
 		return luminance < 0.5 ? transparent ? ContextCompat.getColor(context, R.color.color_black_transparent) : Color.BLACK : Color.WHITE;
+	}
+
+	public static float getProportionalAlpha(float startValue,
+	                                         float endValue,
+	                                         float currentValue) {
+		currentValue = Math.min(currentValue, endValue);
+		float proportion = (endValue - startValue) / 100;
+		if (currentValue > startValue) {
+			float currentInRange = currentValue - startValue;
+			return 1.0f - (currentInRange / proportion) / 100;
+		}
+		return 1.0f;
+	}
+
+	@ColorInt
+	public static int getProportionalColorMix(@ColorInt int startColor,
+	                                          @ColorInt int endColor,
+	                                          float startValue,
+	                                          float endValue,
+	                                          float currentValue) {
+		currentValue = Math.min(currentValue, endValue);
+		float proportion = (endValue - startValue) / 100;
+		if (currentValue > startValue) {
+			float currentInRange = currentValue - startValue;
+			float amount = (currentInRange / proportion) / 100;
+			return UiUtilities.mixTwoColors(endColor, startColor, amount);
+		}
+		return startColor;
 	}
 
 	@ColorInt
@@ -722,6 +751,13 @@ public class UiUtilities {
 				AndroidUtils.setBackground(ctx, buttonView, nightMode, R.drawable.dlg_btn_primary_light, R.drawable.dlg_btn_primary_dark);
 				textAndIconColorResId = nightMode ? R.color.dlg_btn_primary_text_dark : R.color.dlg_btn_primary_text_light;
 				break;
+			case PRIMARY_HARMFUL:
+				if (v21) {
+					AndroidUtils.setBackground(ctx, buttonContainer, nightMode, R.drawable.ripple_solid_light, R.drawable.ripple_solid_dark);
+				}
+				AndroidUtils.setBackground(buttonView, AppCompatResources.getDrawable(ctx, R.drawable.dlg_btn_primary_harmfull));
+				textAndIconColorResId = nightMode ? R.color.dlg_btn_primary_text_dark : R.color.dlg_btn_primary_text_light;
+				break;
 			case SECONDARY:
 				if (v21) {
 					AndroidUtils.setBackground(ctx, buttonContainer, nightMode, R.drawable.ripple_solid_light, R.drawable.ripple_solid_dark);
@@ -777,15 +813,17 @@ public class UiUtilities {
 		}
 	}
 
-	public static SpannableString createSpannableString(@NonNull String text, @NonNull StyleSpan styleSpan, @NonNull String... textToStyle) {
+	public static SpannableString createSpannableString(@NonNull String text, int style, @NonNull String... textToStyle) {
 		SpannableString spannable = new SpannableString(text);
 		for (String t : textToStyle) {
-			setSpan(spannable, styleSpan, text, t);
+			setSpan(spannable, new StyleSpan(style), text, t);
 		}
 		return spannable;
 	}
 
-	private static void setSpan(@NonNull SpannableString spannable, @NonNull Object styleSpan, @NonNull String text, @NonNull String t) {
+	private static void setSpan(@NonNull SpannableString spannable,
+	                            @NonNull Object styleSpan,
+	                            @NonNull String text, @NonNull String t) {
 		try {
 			int startIndex = text.indexOf(t);
 			spannable.setSpan(

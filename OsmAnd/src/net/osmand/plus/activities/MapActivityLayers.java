@@ -27,6 +27,7 @@ import net.osmand.plus.ContextMenuItem;
 import net.osmand.plus.DialogListItemAdapter;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.OsmandPlugin;
+import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.backend.OsmandSettings;
 import net.osmand.plus.settings.backend.CommonPreference;
 import net.osmand.plus.R;
@@ -55,6 +56,7 @@ import net.osmand.plus.views.OsmandMapTileView;
 import net.osmand.plus.views.layers.POIMapLayer;
 import net.osmand.plus.views.layers.PointLocationLayer;
 import net.osmand.plus.views.layers.PointNavigationLayer;
+import net.osmand.plus.views.layers.PreviewRouteLineLayer;
 import net.osmand.plus.views.layers.RouteLayer;
 import net.osmand.plus.views.layers.RadiusRulerControlLayer;
 import net.osmand.plus.views.layers.DistanceRulerControlLayer;
@@ -78,6 +80,7 @@ public class MapActivityLayers {
 	private MapVectorLayer mapVectorLayer;
 	private GPXLayer gpxLayer;
 	private RouteLayer routeLayer;
+	private PreviewRouteLineLayer previewRouteLineLayer;
 	private POIMapLayer poiMapLayer;
 	private FavouritesLayer mFavouritesLayer;
 	private TransportStopsLayer transportStopsLayer;
@@ -142,6 +145,10 @@ public class MapActivityLayers {
 		// 1. route layer
 		routeLayer = new RouteLayer(routingHelper);
 		mapView.addLayer(routeLayer, 1);
+
+		// 1.5 preview route line layer
+		previewRouteLineLayer = new PreviewRouteLineLayer();
+		mapView.addLayer(previewRouteLineLayer, 1.5f);
 
 		// 2. osm bugs layer
 		// 3. poi layer
@@ -380,6 +387,7 @@ public class MapActivityLayers {
 					PoiUIFilter wiki = poiFilters.getTopWikiPoiFilter();
 					poiFilters.clearSelectedPoiFilters(wiki);
 					poiFilters.addSelectedPoiFilter(pf);
+					updateRoutingPoiFiltersIfNeeded();
 					mapView.refreshMap();
 				}
 			}
@@ -565,6 +573,18 @@ public class MapActivityLayers {
 		}
 	}
 
+	private void updateRoutingPoiFiltersIfNeeded() {
+		OsmandApplication app = getApplication();
+		OsmandSettings settings = app.getSettings();
+		RoutingHelper routingHelper = app.getRoutingHelper();
+		boolean usingRouting = routingHelper.isFollowingMode() || routingHelper.isRoutePlanningMode()
+				|| routingHelper.isRouteBeingCalculated() || routingHelper.isRouteCalculated();
+		ApplicationMode routingMode = routingHelper.getAppMode();
+		if (usingRouting && routingMode != settings.getApplicationMode()) {
+			settings.setSelectedPoiFilters(routingMode, settings.getSelectedPoiFilters());
+		}
+	}
+
 	private boolean isNightMode(OsmandApplication app) {
 		if (app == null) {
 			return false;
@@ -582,6 +602,10 @@ public class MapActivityLayers {
 
 	public RouteLayer getRouteLayer() {
 		return routeLayer;
+	}
+
+	public PreviewRouteLineLayer getPreviewRouteLineLayer() {
+		return previewRouteLineLayer;
 	}
 
 	public PointNavigationLayer getNavigationLayer() {

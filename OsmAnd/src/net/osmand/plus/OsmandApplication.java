@@ -25,13 +25,6 @@ import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.multidex.MultiDex;
-import androidx.multidex.MultiDexApplication;
-
 import net.osmand.AndroidUtils;
 import net.osmand.FileUtils;
 import net.osmand.IndexConstants;
@@ -53,6 +46,7 @@ import net.osmand.plus.activities.actions.OsmAndDialogs;
 import net.osmand.plus.api.SQLiteAPI;
 import net.osmand.plus.api.SQLiteAPIImpl;
 import net.osmand.plus.backup.BackupHelper;
+import net.osmand.plus.backup.NetworkSettingsHelper;
 import net.osmand.plus.base.MapViewTrackingUtilities;
 import net.osmand.plus.download.DownloadIndexesThread;
 import net.osmand.plus.download.DownloadService;
@@ -85,7 +79,7 @@ import net.osmand.plus.search.QuickSearchHelper;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.backend.OsmAndAppCustomization;
 import net.osmand.plus.settings.backend.OsmandSettings;
-import net.osmand.plus.settings.backend.backup.SettingsHelper;
+import net.osmand.plus.settings.backend.backup.FileSettingsHelper;
 import net.osmand.plus.voice.CommandPlayer;
 import net.osmand.plus.wikivoyage.data.TravelHelper;
 import net.osmand.router.GeneralRouter;
@@ -107,6 +101,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 import btools.routingapp.BRouterServiceConnection;
 import btools.routingapp.IBRouterService;
 
@@ -161,7 +161,8 @@ public class OsmandApplication extends MultiDexApplication {
 	InAppPurchaseHelper inAppPurchaseHelper;
 	MapViewTrackingUtilities mapViewTrackingUtilities;
 	LockHelper lockHelper;
-	SettingsHelper settingsHelper;
+	FileSettingsHelper fileSettingsHelper;
+	NetworkSettingsHelper networkSettingsHelper;
 	GpxDbHelper gpxDbHelper;
 	QuickActionRegistry quickActionRegistry;
 	OsmOAuthHelper osmOAuthHelper;
@@ -278,11 +279,11 @@ public class OsmandApplication extends MultiDexApplication {
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
-	
+
+	@NonNull
 	public UiUtilities getUIUtilities() {
 		return iconsCache;
 	}
-	
 	
 	@Override
 	public void onTerminate() {
@@ -391,8 +392,12 @@ public class OsmandApplication extends MultiDexApplication {
 		return lockHelper;
 	}
 
-	public SettingsHelper getSettingsHelper() {
-		return settingsHelper;
+	public FileSettingsHelper getFileSettingsHelper() {
+		return fileSettingsHelper;
+	}
+
+	public NetworkSettingsHelper getNetworkSettingsHelper() {
+		return networkSettingsHelper;
 	}
 
 	public OsmOAuthHelper getOsmOAuthHelper() {
@@ -506,6 +511,9 @@ public class OsmandApplication extends MultiDexApplication {
 	                                   boolean warningNoneProvider, Runnable run, boolean showDialog, boolean force, final boolean applyAllModes) {
 		String voiceProvider = osmandSettings.VOICE_PROVIDER.getModeValue(applicationMode);
 		if (voiceProvider == null || OsmandSettings.VOICE_PROVIDER_NOT_USE.equals(voiceProvider)) {
+			if (OsmandSettings.VOICE_PROVIDER_NOT_USE.equals(voiceProvider)) {
+				osmandSettings.VOICE_MUTE.setModeValue(applicationMode, true);
+			}
 			if (warningNoneProvider && voiceProvider == null) {
 				if (uiContext instanceof MapActivity) {
 					OsmAndDialogs.showVoiceProviderDialog((MapActivity) uiContext, applicationMode, applyAllModes);
@@ -872,8 +880,8 @@ public class OsmandApplication extends MultiDexApplication {
 	@Nullable
 	public GeneralRouter getRouter(Builder builder, ApplicationMode am) {
 		GeneralRouter router = builder.getRouter(am.getRoutingProfile());
-		if (router == null && am.getParent() != null) {
-			router = builder.getRouter(am.getParent().getStringKey());
+		if (router == null) {
+			router = builder.getRouter(am.getDefaultRoutingProfile());
 		}
 		return router;
 	}

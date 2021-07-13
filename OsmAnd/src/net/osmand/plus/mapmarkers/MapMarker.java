@@ -3,6 +3,7 @@ package net.osmand.plus.mapmarkers;
 import android.content.Context;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import net.osmand.GPXUtilities.WptPt;
@@ -23,31 +24,28 @@ public class MapMarker implements LocationPoint {
 	public LatLon point;
 	private PointDescription pointDescription;
 	public int colorIndex;
-	public int index;
 	public boolean history;
-	public boolean selected;
-	public int dist;
 	public long creationDate;
 	public long visitedDate;
-	public String nextKey;
 	public String groupKey;
 	public String groupName;
 	public WptPt wptPt;
 	public FavouritePoint favouritePoint;
 	public String mapObjectName;
 
-	public MapMarker(LatLon point, PointDescription name, int colorIndex, boolean selected, int index) {
+	public int dist;
+	public boolean selected;
+
+	public MapMarker(@NonNull LatLon point, @NonNull PointDescription name, int colorIndex) {
 		this.point = point;
 		this.pointDescription = name;
 		this.colorIndex = colorIndex;
-		this.selected = selected;
-		this.index = index;
 	}
 
-	public int getType() {
+	public ItineraryType getType() {
 		return favouritePoint == null ?
-				(wptPt == null ? MapMarkersGroup.ANY_TYPE : MapMarkersGroup.GPX_TYPE) :
-				MapMarkersGroup.FAVORITES_TYPE;
+				(wptPt == null ? ItineraryType.MARKERS : ItineraryType.TRACK) :
+				ItineraryType.FAVOURITES;
 	}
 
 	public PointDescription getPointDescription(Context ctx) {
@@ -110,6 +108,22 @@ public class MapMarker implements LocationPoint {
 		int result = point.hashCode();
 		result = 31 * result + colorIndex;
 		return result;
+	}
+
+	public void copyParams(@NonNull MapMarker marker) {
+		point = marker.point;
+		colorIndex = marker.colorIndex;
+		history = marker.history;
+		selected = marker.selected;
+		dist = marker.dist;
+		creationDate = marker.creationDate;
+		visitedDate = marker.visitedDate;
+		groupKey = marker.groupKey;
+		groupName = marker.groupName;
+		wptPt = marker.wptPt;
+		favouritePoint = marker.favouritePoint;
+		mapObjectName = marker.mapObjectName;
+		pointDescription = marker.pointDescription;
 	}
 
 	private static final int[] colorsIds = new int[] {

@@ -29,30 +29,33 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import net.osmand.AndroidUtils;
 import net.osmand.Collator;
 import net.osmand.OsmAndCollator;
 import net.osmand.map.OsmandRegions;
 import net.osmand.plus.OsmandApplication;
+import net.osmand.plus.R;
 import net.osmand.plus.UiUtilities;
 import net.osmand.plus.activities.LocalIndexInfo;
+import net.osmand.plus.base.OsmAndListFragment;
+import net.osmand.plus.chooseplan.ChoosePlanFragment;
+import net.osmand.plus.chooseplan.OsmAndFeature;
+import net.osmand.plus.download.DownloadActivity;
+import net.osmand.plus.download.DownloadIndexesThread.DownloadEvents;
+import net.osmand.plus.download.DownloadResources;
+import net.osmand.plus.download.IndexItem;
 import net.osmand.plus.helpers.AndroidUiHelper;
+import net.osmand.plus.inapp.InAppPurchaseHelper;
+import net.osmand.plus.inapp.InAppPurchaseHelper.InAppPurchaseListener;
+import net.osmand.plus.inapp.InAppPurchaseHelper.InAppPurchaseTaskType;
 import net.osmand.plus.liveupdates.LiveUpdatesClearBottomSheet.RefreshLiveUpdates;
 import net.osmand.plus.liveupdates.LiveUpdatesFragment;
 import net.osmand.plus.liveupdates.LiveUpdatesHelper.LiveUpdateListener;
 import net.osmand.plus.liveupdates.LoadLiveMapsTask;
 import net.osmand.plus.liveupdates.LoadLiveMapsTask.LocalIndexInfoAdapter;
-import net.osmand.plus.chooseplan.ChoosePlanDialogFragment.ChoosePlanDialogType;
 import net.osmand.plus.settings.backend.OsmandSettings;
-import net.osmand.plus.R;
-import net.osmand.plus.base.OsmAndListFragment;
-import net.osmand.plus.chooseplan.ChoosePlanDialogFragment;
-import net.osmand.plus.download.DownloadActivity;
-import net.osmand.plus.download.DownloadIndexesThread.DownloadEvents;
-import net.osmand.plus.download.DownloadResources;
-import net.osmand.plus.download.IndexItem;
-import net.osmand.plus.inapp.InAppPurchaseHelper;
 import net.osmand.util.Algorithms;
 
 import java.util.ArrayList;
@@ -62,7 +65,7 @@ import java.util.List;
 import static net.osmand.plus.liveupdates.LiveUpdatesFragment.showUpdateDialog;
 import static net.osmand.plus.liveupdates.LiveUpdatesFragment.updateCountEnabled;
 
-public class UpdatesIndexFragment extends OsmAndListFragment implements DownloadEvents, RefreshLiveUpdates, LiveUpdateListener {
+public class UpdatesIndexFragment extends OsmAndListFragment implements DownloadEvents, RefreshLiveUpdates, LiveUpdateListener, InAppPurchaseListener {
 	private static final int RELOAD_ID = 5;
 	private UpdateIndexAdapter listAdapter;
 	private String errorMessage;
@@ -115,7 +118,7 @@ public class UpdatesIndexFragment extends OsmAndListFragment implements Download
 	}
 
 	@Override
-	public void newDownloadIndexes() {
+	public void onUpdatedIndexesList() {
 		invalidateListView(getMyActivity());
 		updateUpdateAllButton();
 	}
@@ -236,7 +239,7 @@ public class UpdatesIndexFragment extends OsmAndListFragment implements Download
 		if (position == 0) {
 			DownloadActivity activity = getMyActivity();
 			if (activity != null) {
-				if (!listAdapter.isShowOsmLivePurchaseBanner()) {
+				if (!listAdapter.isShowSubscriptionPurchaseBanner()) {
 					LiveUpdatesFragment.showInstance(activity.getSupportFragmentManager(), this);
 				}
 			}
@@ -285,13 +288,40 @@ public class UpdatesIndexFragment extends OsmAndListFragment implements Download
 		}
 	}
 
+	@Override
+	public void onError(InAppPurchaseTaskType taskType, String error) {
+
+	}
+
+	@Override
+	public void onGetItems() {
+
+	}
+
+	@Override
+	public void onItemPurchased(String sku, boolean active) {
+		invalidateListView(getMyActivity());
+		updateUpdateAllButton();
+		startLoadLiveMapsAsyncTask(getMyApplication());
+	}
+
+	@Override
+	public void showProgress(InAppPurchaseTaskType taskType) {
+
+	}
+
+	@Override
+	public void dismissProgress(InAppPurchaseTaskType taskType) {
+
+	}
+
 	private class UpdateIndexAdapter extends ArrayAdapter<IndexItem> implements LocalIndexInfoAdapter {
 
 		static final int INDEX_ITEM = 0;
 		static final int OSM_LIVE_BANNER = 1;
 		List<IndexItem> items;
 		private final ArrayList<LocalIndexInfo> mapsList = new ArrayList<>();
-		private final boolean showOsmLivePurchaseBanner;
+		private final boolean showSubscriptionPurchaseBanner;
 		private TextView countView;
 		private int countEnabled = 0;
 
@@ -310,14 +340,14 @@ public class UpdatesIndexFragment extends OsmAndListFragment implements Download
 			countEnabled = updateCountEnabled(countView, mapsList, settings);
 		}
 
-		public UpdateIndexAdapter(Context context, int resource, List<IndexItem> items, boolean showOsmLivePurchaseBanner) {
+		public UpdateIndexAdapter(Context context, int resource, List<IndexItem> items, boolean showSubscriptionPurchaseBanner) {
 			super(context, resource, items);
 			this.items = items;
-			this.showOsmLivePurchaseBanner = showOsmLivePurchaseBanner;
+			this.showSubscriptionPurchaseBanner = showSubscriptionPurchaseBanner;
 		}
 
-		public boolean isShowOsmLivePurchaseBanner() {
-			return showOsmLivePurchaseBanner;
+		public boolean isShowSubscriptionPurchaseBanner() {
+			return showSubscriptionPurchaseBanner;
 		}
 
 		@Override
@@ -361,18 +391,17 @@ public class UpdatesIndexFragment extends OsmAndListFragment implements Download
 				} else if (viewType == OSM_LIVE_BANNER) {
 					OsmandApplication app = getMyApplication();
 					boolean nightMode = !app.getSettings().isLightContent();
-					if (showOsmLivePurchaseBanner) {
+					if (showSubscriptionPurchaseBanner) {
 						view = inflater.inflate(R.layout.osm_live_banner_list_item, parent, false);
 						ColorStateList stateList = AndroidUtils.createPressedColorStateList(app, nightMode,
 								R.color.switch_button_active_light, R.color.switch_button_active_stroke_light,
 								R.color.switch_button_active_dark, R.color.switch_button_active_stroke_dark);
 						CardView cardView = ((CardView) view.findViewById(R.id.card_view));
 						cardView.setCardBackgroundColor(stateList);
-						cardView.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								ChoosePlanDialogFragment.showDialogInstance(getMyApplication(),
-										getMyActivity().getSupportFragmentManager(), ChoosePlanDialogType.OSM_LIVE);
+						cardView.setOnClickListener(v -> {
+							FragmentActivity activity = getMyActivity();
+							if (activity != null) {
+								ChoosePlanFragment.showInstance(activity, OsmAndFeature.HOURLY_MAP_UPDATES);
 							}
 						});
 					} else {
@@ -397,7 +426,7 @@ public class UpdatesIndexFragment extends OsmAndListFragment implements Download
 						additionalButton.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								if (!listAdapter.isShowOsmLivePurchaseBanner()) {
+								if (!listAdapter.isShowSubscriptionPurchaseBanner()) {
 									showUpdateDialog(getActivity(), getFragmentManager(), UpdatesIndexFragment.this);
 								}
 							}

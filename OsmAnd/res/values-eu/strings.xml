@@ -158,9 +158,6 @@
     <string name="shared_string_control_start">Hasi</string>
     <string name="map_widget_av_notes">Audio/bideo oharrak</string>
     <string name="osmand_srtm_short_description_80_chars">Lineaz kanpoko sestra-kurben OsmAnd gehigarria</string>
-    <string name="osmand_srtm_long_description_1000_chars">Gehigarri honek OsmAnd-eko lineaz kanpoko mapetan agertu daitezkeen sestra-kurbak eta erliebe-itzalak eskaintzen ditu. Kirolariek, mendizaleek eta orokorrean paisaiaren erliebearen estrukturan interesa duen edonork gogoko izango du. 
-\n 
-\nDatu globalak (iparraldera 70 gradu eta hegoaldera 70 gradu bitartean) STRM (Shuttle Radar Topography Mission) eta ASTER (Advanced Spaceborne Thermal Emission and Reflection Radiometer) neurrietan oinarrituak daude, espazioko Terra irudi tresna, NASAren Lurra Behatzeko Sistemaren satelite enblematikoa. ASTER NASAren, Japoniako Ekonomi, Merkataritza eta Industria Ministerioaren (EMIM), eta Japoneko Espazio Sistemaren (J-espaziosistema) elkarlanaren ondorioz sortua izan da.</string>
     <string name="map_widget_distancemeasurement">Distantzia neurketa</string>
     <string name="audionotes_location_not_defined">Sakatu \"Erabili kokapena…\" oharra kokapenera gehitzeko.</string>
     <string name="map_widget_audionotes">Audio oharrak</string>
@@ -2193,7 +2190,6 @@ Area honi dagokio: %1$s x %2$s</string>
     <string name="shared_string_time">Denbora</string>
     <string name="total_distance">Distantzia guztira</string>
     <string name="routing_attr_height_obstacles_name">Erabili elebazio kotak</string>
-
     <string name="shared_string_slope">Malda</string>
     <string name="lang_ber">Berberera</string>
     <string name="right_side_navigation">Eskumatik gidatzea</string>
@@ -3302,7 +3298,6 @@ Area honi dagokio: %1$s x %2$s</string>
     <string name="select_color">Hautatu kolorea</string>
     <string name="edit_profiles_descr">Ezin dira OsmAnd-en lehenetsitako profilak ezabatu, baina aurreko pantailan desgaitu ditzakezu, edo behealdera mugitu.</string>
     <string name="edit_profiles">Editatu profilak</string>
-    <string name="select_nav_profile_dialog_message">\'Nabigazio motak\' ibilbideak nola kalkulatzen diren agintzen du.</string>
     <string name="profile_appearance">Profilaren itxura</string>
     <string name="choose_icon_color_name">Ikonoa, kolorea eta izena</string>
     <string name="reorder_profiles">Editatu profil-zerrenda</string>
@@ -3907,4 +3902,155 @@ Area honi dagokio: %1$s x %2$s</string>
     <string name="routing_engine_vehicle_type_bike">Bizikleta</string>
     <string name="routing_engine_vehicle_type_car">Kotxea</string>
     <string name="copy_address">Kopiatu helbidea</string>
+    <string name="exit_number">Irteera-zenbakia</string>
+    <string name="route_line_use_gradient_coloring">Ibilbidearen lerroa maldaren arabera dago koloreztatuta.</string>
+    <string name="language_description">Hautatu nahiago duzun hizkuntza eta ahots mota.</string>
+    <string name="tts_description">Testutik ahozkora (TTS) ahozka dezake esaldi mota guztiak: kaleen izenak, biraketa aginduak, interesguneen izenak eta abar.</string>
+    <string name="tts_title">TTS</string>
+    <string name="use_system_language">Erabili sistemaren hizkuntza</string>
+    <string name="shared_string_itinerary">Ibilbidea</string>
+    <string name="osmand_live">OsmAnd Live</string>
+    <string name="annual_subscription">Urteko harpidetza</string>
+    <string name="monthly_subscription">Hilabeteko harpidetza</string>
+    <string name="three_months_subscription">Hiru hilabeteko harpidetza</string>
+    <string name="next_billing_date">Hurrengo fakturazio data :%1$s</string>
+    <string name="osmand_live_cancelled">Bertan behera utzi da</string>
+    <string name="renew_subscription">Berritu harpidetza</string>
+    <string name="in_grace_period">Grazia aldian</string>
+    <string name="on_hold">Zain</string>
+    <string name="expired">Iraungi da</string>
+    <string name="release_4_0_beta">• Sestra lerroak oinetan deskargatzeko aukera gehitu da
+\n
+\n • Planifikatu ibilbidearen paisaia: gehitu dira fitxak puntu edo grafikoen artean aldatzeko
+\n
+\n • OsmAnd Live eguneraketak \"Deskargak&gt; Eguneratzeak\" atalera eraman dira
+\n
+\n • Arrastoak orain altueraren, abiaduraren edo maldaren arabera koloreztatu daitezke.
+\n
+\n • ibilbidearen marraren itxura aldatzeko aukera gehitu da.
+\n
+\n • \"Bidaiaren grabaketa\" elkarrizketa-koadroa eguneratu da
+\n
+\n</string>
+    <string name="update_all_maps_added">%1$s-ra gehitutako mapa guztiak eguneratu\?</string>
+    <string name="shared_string_feet">oin</string>
+    <string name="srtm_unit_format">Sestra-marren unitate aldaketa</string>
+    <string name="srtm_download_list_help_message">OsmAnd-ek sestra-marren datuak metro eta oinetan ematen ditu. Fitxategia berriro deskargatu beharko duzu formatua aldatzeko.</string>
+    <string name="srtm_download_single_help_message">Aukeratu beste bat. Fitxategia berriro deskargatu beharko duzu formatua aldatzeko.</string>
+    <string name="announce_when_exceeded">Abisatu gainditzen denean</string>
+    <string name="user_points">Erabiltzailearen puntuak</string>
+    <string name="output">Irteera</string>
+    <string name="shared_string_min_height">Altuera minimoa</string>
+    <string name="shared_string_max_height">Altuera maximoa</string>
+    <string name="recorded_description">Grabatutako ahotsak hobeto entzuten dira, baina aurrez grabatutako esaldiak bakarrik ahoskatu ditzake: begiratu argibideak. Ezin dira kale izenak edo POI izenak jakinarazi.</string>
+    <string name="route_line_use_map_style_color">Erabili maparen estiloa (%1$s) kolore lehenetsia.</string>
+    <string name="route_line_use_map_style_width">Erabili maparen estiloa (%1$s) kolore lehenetsia.</string>
+    <string name="poi_routes">Ibilbideak</string>
+    <string name="routing_attr_avoid_low_emission_zone_description">Saihestu emisio baxuko zonak</string>
+    <string name="routing_attr_avoid_low_emission_zone_name">Saihestu emisio baxuko zonak</string>
+    <string name="search_more">Bilatu gehiago…</string>
+    <string name="ltr_or_rtl_triple_combine_via_space">%1$s %2$s %3$s</string>
+    <string name="backup_and_restore">Babeskopia eta Leheneratzea</string>
+    <string name="last_backup">Azken babeskopia</string>
+    <string name="duration_ago">Duela %1$s</string>
+    <string name="osmand_cloud">OsmAnd Cloud</string>
+    <string name="osmand_cloud_authorize_descr">Ez galdu inoiz zure datuak, egin babeskopia eta leheneratu zure informazio guztia arazorik gabe.</string>
+    <string name="local_backup">Babeskopia lokala</string>
+    <string name="local_backup_descr">Egin babeskopia edo leheneratu datuak fitxategi lokal batetik.</string>
+    <string name="backup_into_file">Egin babeskopia fitxategian</string>
+    <string name="restore_from_file">Leheneratu fitxategitik</string>
+    <string name="osmand_cloud_help_descr">Laguntza behar duzu\? Kontaktatu gurekin hemen: %1$s</string>
+    <string name="osmand_cloud_create_account_descr">Sartu zure posta helbidea, zure datu guztiak hari lotuko zaizkio.
+\nEgiaztatze-kodea bidaliko dizugu posta helbide horretara.</string>
+    <string name="osmand_cloud_login_descr">Sartu erregistratzeko erabili zenuen helbide elektronikoa. Bidaliko dizugu hurrengo urratserako behar duzun erabilera bakarreko pasahitza.</string>
+    <string name="verify_email_address">Egiaztatu e-posta helbidea</string>
+    <string name="verify_email_address_descr">Bidali dugu egiaztatzeko kodea %1$s kontura, sartu beheko eremuan.</string>
+    <string name="cloud_email_not_registered">E-posta hori ez dago erregistratuta OsmAnd Cloud-en</string>
+    <string name="cloud_email_already_registered">E-posta hori duen kontu bat dagoeneko erregistratuta dago.</string>
+    <string name="resend_verification_code">Birbidali kodea</string>
+    <string name="verification_code_missing">Ez dut jaso egiaztatze-koderik</string>
+    <string name="verification_code_missing_description">Kodearen itxaronaldia 10 minutukoa izan daiteke; gainera, Zaborra karpeta egiaztatu dezakezu. Laguntzen ez badizu, erabili beheko botoia.</string>
+    <string name="select_nav_profile_dialog_message">\"Nabigazio motak\" ibilbideak nola kalkulatzen diren arautzen du. Lineaz kanpoko eta lineako bideratze motorren artean hauta dezakezu.</string>
+    <string name="backup_delete_old_data_descr">Zure datuen uneko bertsioak OsmAnd Hodeian gordeko dira</string>
+    <string name="backup_delete_old_data_warning">Aurretik kargatutako datuen aldaketen historia ezabatzekotan zaude.
+\n
+\nDatuen uneko bertsioa zerbitzarian gordeko da, baina ezin izango duzu lehen egindako aldaketetara itzuli.</string>
+    <string name="backup_data">Datuen babeskopia</string>
+    <string name="select_backup_data_descr">Aukeratu datuak eta karpetak babeskopiarako.</string>
+    <string name="backup_restore_data_descr">Leheneratu gailuko datuak, lineako babeskopia erabilita.</string>
+    <string name="backup_restore_data">Leheneratu datuak</string>
+    <string name="restore_from_osmand_cloud">Leheneratu OsmAnd hodeitik</string>
+    <string name="choose_what_to_restore">Aukeratu zer leheneratu.</string>
+    <string name="restore_selected_data">Leheneratu hautatutako datuak</string>
+    <string name="receiving_data_from_server">Datuak jasotzen zerbitzaritik</string>
+    <string name="restore_complete">Leheneratzea burutu da</string>
+    <string name="grey_color_slope">Kolore grisa erabiltzen da malda zehaztu gabe dagoenean.</string>
+    <string name="backup_version_history">Bertsioen historia</string>
+    <string name="backup_storage_taken">Biltegiratzea</string>
+    <string name="backup_version_history_delete_descr">Desgaituta dauden moten aldaketen historia hodeitik ezabatu nahi duzu\?</string>
+    <string name="delete_version_history">Ezabatu bertsioen historia</string>
+    <string name="shared_string_external">Kanpokoa</string>
+    <string name="provided_by">%1$s-k hornitua</string>
+    <string name="failed_loading_predefined_engines">Huts egin du lehenetsitako txantiloien zerrenda kargatzen.
+\nEgiaztatu zure interneteko konexioa.</string>
+    <string name="shared_string_predefined">Lehenetsia</string>
+    <string name="backup_complete">Babeskopia burutu da</string>
+    <string name="backup_now">Egin babeskopia orain</string>
+    <string name="make_backup">Egin babeskopia</string>
+    <string name="make_backup_descr">Aldaketa asko daude gailu honetan, egin datuen babeskopia hauek ez galtzeko.</string>
+    <string name="backup_conflicts">Gatazkak</string>
+    <string name="backup_confilcts_descr">Zenbait fitxategi ezin dira kargatu zerbitzarira bertan bertsio berri bat dagoelako.</string>
+    <string name="backup_view_conflicts">Ikusi gatazkak</string>
+    <string name="backup_no_internet_descr">Egiaztatu Interneteko konexioa eta deskargatu berriro.</string>
+    <string name="backup_pause_all">Pausatu dena</string>
+    <string name="upload_local_version">Kargatu bertsio lokala</string>
+    <string name="download_server_version">Deskargatu zerbitzariko bertsioa</string>
+    <string name="shared_string_logout">Amaitu saioa</string>
+    <string name="backup_delete_all_data">Ezabatu nire datu guztiak</string>
+    <string name="backup_delete_all_data_descr">OsmAnd Cloud-eko datu guztiak ezabatuko dira. Tokiko bertsioak ez dira ukituko.</string>
+    <string name="backup_delete_all_data_warning">Aurretik OsmAnd Cloud-era kargatutako datu guztiak ezabatzekotan zaude, bertsioen historia barne.
+\n
+\nEzingo dituzu ezabatutako datuak berreskuratu.</string>
+    <string name="backup_danger_zone">Arrisku gunea</string>
+    <string name="delete_all_confirmation">Bai, ezabatu denak</string>
+    <string name="backup_delete_old_data">Kendu bertsio zaharrak</string>
+    <string name="routing_attr_avoid_tunnels_description">Saihestu tunelak</string>
+    <string name="routing_attr_avoid_tunnels_name">Saihestu tunelak</string>
+    <string name="backup_promocode">Promozio kodea</string>
+    <string name="send_crash_log">Bidali hutsegiteen erregistroa</string>
+    <string name="send_logcat_log">Bidali logcat erregistroak</string>
+    <string name="purchases_feature_desc_nautical">Izan eskura sakonera nautikoaren informazioa</string>
+    <string name="purchases_feature_desc_terrain">Lurraren sestra-marrak, muinoen itzalekin eta aldapak koloreekin markatuta bereizteko gailurrak eta lautadak.</string>
+    <string name="purchases_feature_desc_wikivoyage">Arakatu Wikipedia lineaz kanpo. Herrialde eta eskualdeen arabera eta hizkuntza guztietan eskuragarri dauden artikuluak.</string>
+    <string name="purchases_feature_desc_wikipedia">Arakatu Wikipedia lineaz kanpo. Herrialde eta eskualdeen arabera eta hizkuntza guztietan eskuragarri dauden artikuluak.</string>
+    <string name="purchases_feature_desc_combined_wiki">Arakatu Wikipediako artikuluak edonon, Interneteko konexiorik gabe. Lineaz kanpoko datuak herrialdeen arabera eta hizkuntza guztietan eskuragarri.</string>
+    <string name="purchases_feature_desc_unlimited_map_download">Lortu kontinente eta eskualde guztietarako lineaz kanpoko mapen deskarga mugagabeak.</string>
+    <string name="purchases_feature_desc_monthly_map_updates">Lortu lineaz kanpoko mapen hileroko eguneratzeak.</string>
+    <string name="purchases_feature_desc_hourly_map_updates">Lortu sarrien erabiltzen dituzun mapen eguneraketak, aukeratu: orduko, eguneroko edo asteko eguneratzeak. Eguneratzeak modu mailakatuan deskargatzen dira, aldatutako eremurako soilik.</string>
+    <string name="purchases_feature_desc_advanced_widgets">Eskura izan OsmAnd-en trepeta aurreratuak.</string>
+    <string name="purchases_feature_desc_osmand_cloud">Lortu OsmAnd Cloud OsmAnd datu guztiak linean gordetzeko. Ez duzu informaziorik galduko berrinstalatzean, egin babeskopia eta leheneratu informazio guztia arazorik gabe.</string>
+    <string name="unlimited_map_downloads">Mapen deskarga mugagabea</string>
+    <string name="wikipedia_and_wikivoyage_offline">Lineaz kanpoko Wikipedia eta Wikivoyage</string>
+    <string name="terrain_maps_contour_lines_hillshade_slope">Lurraren mapak: sestra-lerroak, muinoen itzalak, malda</string>
+    <string name="offline_wikipeadia">Lineaz kanpoko Wikipedia</string>
+    <string name="terrain_maps">Lurraren mapak</string>
+    <string name="nautical_depth">Sakonera nautikoa</string>
+    <string name="advanced_widgets">Trepeta aurreratuak</string>
+    <string name="you_can_get_feature_as_part_of_pattern">Eskuratu dezakezu “%1$s” %2$s planaren osagai gisa. Aldaratu planak:</string>
+    <string name="ltr_or_rtl_combine_via_or">%1$s edo %2$s</string>
+    <string name="continue_with">jarraitu %1$s-rekin</string>
+    <string name="not_available_with">Ez da erabilgarria %1$s-rekin</string>
+    <string name="redeem_promo_code">Erabili promozio kodea</string>
+    <string name="osmand_maps_plus_tagline">Lortu aparteko funtzioak</string>
+    <string name="osmand_pro_tagline">Lortu funtzio guztiak</string>
+    <string name="shared_string_learn_more">Ikasi gehiago</string>
+    <string name="shared_string_not_included">Ez dago barne</string>
+    <string name="shared_string_includes">Barne</string>
+    <string name="complete_purchase">Erosketa osoa</string>
+    <string name="regular_price">Ohiko prezioa</string>
+    <string name="from_with_param">%1$s-tik</string>
+    <string name="backup_delete_types_descr">Desgaituta dauden motetarako datuak hodeitik ezabatu nahi dituzu\?</string>
+    <string name="backup_delete_types">Ezabatu desgaitutako moten datuak</string>
+    <string name="shared_string_discussion">Eztabaida</string>
+    <string name="shared_string_view_all">Ikusi dena</string>
 </resources>

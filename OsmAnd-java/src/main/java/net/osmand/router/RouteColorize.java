@@ -33,10 +33,20 @@ public class RouteColorize {
     public static final int GREEN = rgbaToDecimal(90, 220, 95, 255);
     public static final int YELLOW = rgbaToDecimal(212, 239, 50, 255);
     public static final int RED = rgbaToDecimal(243, 55, 77, 255);
-    public static final int[] colors = new int[] {GREEN, YELLOW, RED};
+    public static final int GREEN_SLOPE = rgbaToDecimal(46, 185, 0, 255);
+    public static final int WHITE = rgbaToDecimal(255, 255, 255, 255);
+    public static final int YELLOW_SLOPE = rgbaToDecimal(255, 222, 2, 255);
+    public static final int RED_SLOPE = rgbaToDecimal(255, 1, 1, 255);
+    public static final int PURPLE_SLOPE = rgbaToDecimal(130, 1, 255, 255);
+
+    public static final int[] COLORS = new int[] {GREEN, YELLOW, RED};
+    public static final int[] SLOPE_COLORS = new int[] {GREEN_SLOPE, WHITE, YELLOW_SLOPE, RED_SLOPE, PURPLE_SLOPE};
+
+    public static final double SLOPE_MIN_VALUE = -0.25;//25%
+    public static final double SLOPE_MAX_VALUE = 1.0;//100%
+    public static final double[][] SLOPE_PALETTE = {{SLOPE_MIN_VALUE, GREEN_SLOPE}, {0.0, WHITE}, {0.125, YELLOW_SLOPE}, {0.25, RED_SLOPE}, {SLOPE_MAX_VALUE, PURPLE_SLOPE}};
 
     private static final float DEFAULT_BASE = 17.2f;
-    private static final int MAX_SLOPE_VALUE = 25;
 
     public enum ColorizationType {
         ELEVATION,
@@ -133,10 +143,17 @@ public class RouteColorize {
         } else {
             values = listToArray(valList);
         }
-        calculateMinMaxValue();
-        maxValue = getMaxValue(colorizationType, analysis, minValue, maxProfileSpeed);
+        calculateMinMaxValue(analysis, maxProfileSpeed);
         checkPalette();
         sortPalette();
+    }
+
+    public int getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(int zoom) {
+        this.zoom = zoom;
     }
 
     /**
@@ -200,7 +217,11 @@ public class RouteColorize {
 
     public int getColorByValue(double value) {
         if (Double.isNaN(value)) {
-            value = (minValue + maxValue) / 2;
+            if (colorizationType == ColorizationType.SLOPE) {
+                return LIGHT_GREY;
+            } else {
+                value = (minValue + maxValue) / 2;
+            }
         }
         for (int i = 0; i < palette.length - 1; i++) {
             if (value == palette[i][VALUE_INDEX])
@@ -211,12 +232,13 @@ public class RouteColorize {
                 double minPaletteValue = palette[i][VALUE_INDEX];
                 double maxPaletteValue = palette[i + 1][VALUE_INDEX];
                 double percent = (value - minPaletteValue) / (maxPaletteValue - minPaletteValue);
-                double resultRed = getRed(minPaletteColor) + percent * (getRed(maxPaletteColor) - getRed(minPaletteColor));
-                double resultGreen = getGreen(minPaletteColor) + percent * (getGreen(maxPaletteColor) - getGreen(minPaletteColor));
-                double resultBlue = getBlue(minPaletteColor) + percent * (getBlue(maxPaletteColor) - getBlue(minPaletteColor));
-                double resultAlpha = getAlpha(minPaletteColor) + percent * (getAlpha(maxPaletteColor) - getAlpha(minPaletteColor));
-                return rgbaToDecimal((int) resultRed, (int) resultGreen, (int) resultBlue, (int) resultAlpha);
+                return getIntermediateColor(minPaletteColor, maxPaletteColor, percent);
             }
+        }
+        if (value <= palette[0][0]) {
+            return (int)palette[0][1];
+        } else if (value >= palette[palette.length-1][0]) {
+            return (int) palette[palette.length-1][1];
         }
         return getTransparentColor();
     }
@@ -242,7 +264,7 @@ public class RouteColorize {
         return rgbaToDecimal(0, 0, 0, 0);
     }
 
-    private List<RouteColorizationPoint> simplify() {
+    public List<RouteColorizationPoint> simplify() {
         if (dataList == null) {
             dataList = new ArrayList<>();
             for (int i = 0; i < latitudes.length; i++) {
@@ -266,6 +288,8 @@ public class RouteColorize {
             List<RouteColorizationPoint> sublist = dataList.subList(prevId, currentId);
             simplified.addAll(getExtremums(sublist));
         }
+        Node lastSurvivedPoint = result.get(result.size() - 1);
+        simplified.add(dataList.get((int) lastSurvivedPoint.getId()));
         return simplified;
     }
 
@@ -316,14 +340,7 @@ public class RouteColorize {
     private void checkPalette() {
         if (palette == null || palette.length < 2 || palette[0].length < 2 || palette[1].length < 2) {
             LOG.info("Will use default palette");
-            palette = new double[3][2];
-
-            double[][] defaultPalette = {
-                    {minValue, GREEN},
-                    {(minValue + maxValue) / 2, YELLOW},
-                    {maxValue, RED}
-            };
-            palette = defaultPalette;
+            palette = getDefaultPalette(colorizationType);
         }
         double min;
         double max = min = palette[0][VALUE_INDEX];
@@ -423,17 +440,37 @@ public class RouteColorize {
     }
 
     public static double getMinValue(ColorizationType type, GPXTrackAnalysis analysis) {
-        return type == ColorizationType.ELEVATION ? analysis.minElevation : 0.0;
+        switch (type) {
+            case SPEED:
+                return 0.0;
+            case ELEVATION:
+                return analysis.minElevation;
+            case SLOPE:
+                return SLOPE_MIN_VALUE;
+            default:
+                return -1;
+        }
     }
 
     public static double getMaxValue(ColorizationType type, GPXTrackAnalysis analysis, double minValue, double maxProfileSpeed) {
-        if (type == ColorizationType.SPEED) {
-            return Math.max(analysis.maxSpeed, maxProfileSpeed);
-        } else if (type == ColorizationType.ELEVATION) {
-            return Math.max(analysis.maxElevation, minValue + 50);
-        } else {
-            return MAX_SLOPE_VALUE;
+        switch (type) {
+            case SPEED:
+                return Math.max(analysis.maxSpeed, maxProfileSpeed);
+            case ELEVATION:
+                return Math.max(analysis.maxElevation, minValue + 50);
+            case SLOPE:
+                return SLOPE_MAX_VALUE;
+            default:
+                return -1;
         }
+    }
+
+    public static int getIntermediateColor(int minPaletteColor, int maxPaletteColor, double percent) {
+        double resultRed = getRed(minPaletteColor) + percent * (getRed(maxPaletteColor) - getRed(minPaletteColor));
+        double resultGreen = getGreen(minPaletteColor) + percent * (getGreen(maxPaletteColor) - getGreen(minPaletteColor));
+        double resultBlue = getBlue(minPaletteColor) + percent * (getBlue(maxPaletteColor) - getBlue(minPaletteColor));
+        double resultAlpha = getAlpha(minPaletteColor) + percent * (getAlpha(maxPaletteColor) - getAlpha(minPaletteColor));
+        return rgbaToDecimal((int) resultRed, (int) resultGreen, (int) resultBlue, (int) resultAlpha);
     }
 
     private void calculateMinMaxValue() {
@@ -450,12 +487,30 @@ public class RouteColorize {
         }
     }
 
+    private void calculateMinMaxValue(GPXTrackAnalysis analysis, float maxProfileSpeed) {
+        calculateMinMaxValue();
+        // set strict limitations for maxValue
+        maxValue = getMaxValue(colorizationType, analysis, minValue, maxProfileSpeed);
+    }
+
     private double[] listToArray(List<Double> doubleList) {
         double[] result = new double[doubleList.size()];
         for (int i = 0; i < doubleList.size(); i++) {
             result[i] = doubleList.get(i);
         }
         return result;
+    }
+
+    private double[][] getDefaultPalette(ColorizationType colorizationType) {
+        if (colorizationType == ColorizationType.SLOPE) {
+            return SLOPE_PALETTE;
+        } else {
+            return new double[][] {
+                    {minValue, GREEN},
+                    {(minValue + maxValue) / 2, YELLOW},
+                    {maxValue, RED}
+            };
+        }
     }
 
     private static int rgbaToDecimal(int r, int g, int b, int a) {
@@ -466,19 +521,19 @@ public class RouteColorize {
         return value;
     }
 
-    private int getRed(int value) {
+    private static int getRed(int value) {
         return (value >> 16) & 0xFF;
     }
 
-    private int getGreen(int value) {
+    private static int getGreen(int value) {
         return (value >> 8) & 0xFF;
     }
 
-    private int getBlue(int value) {
+    private static int getBlue(int value) {
         return (value >> 0) & 0xFF;
     }
 
-    private int getAlpha(int value) {
+    private static int getAlpha(int value) {
         return (value >> 24) & 0xff;
     }
 

@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -23,18 +22,19 @@ import net.osmand.IndexConstants;
 import net.osmand.data.LatLon;
 import net.osmand.plus.GpxSelectionHelper;
 import net.osmand.plus.GpxSelectionHelper.SelectedGpxFile;
-import net.osmand.plus.mapmarkers.MapMarkersHelper;
-import net.osmand.plus.mapmarkers.GroupHeader;
-import net.osmand.plus.mapmarkers.MapMarker;
-import net.osmand.plus.mapmarkers.MapMarkersGroup;
-import net.osmand.plus.mapmarkers.ShowHideHistoryButton;
 import net.osmand.plus.OsmAndFormatter;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.UiUtilities;
 import net.osmand.plus.UiUtilities.UpdateLocationViewCache;
 import net.osmand.plus.activities.MapActivity;
+import net.osmand.plus.mapmarkers.GroupHeader;
+import net.osmand.plus.mapmarkers.ItineraryType;
+import net.osmand.plus.mapmarkers.MapMarker;
+import net.osmand.plus.mapmarkers.MapMarkersGroup;
+import net.osmand.plus.mapmarkers.MapMarkersHelper;
 import net.osmand.plus.mapmarkers.SelectWptCategoriesBottomSheetDialogFragment;
+import net.osmand.plus.mapmarkers.ShowHideHistoryButton;
 import net.osmand.plus.wikivoyage.article.WikivoyageArticleDialogFragment;
 import net.osmand.plus.wikivoyage.data.TravelArticle;
 import net.osmand.plus.wikivoyage.data.TravelHelper;
@@ -103,7 +103,7 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 		items = new ArrayList<>();
 		MapMarkersHelper helper = app.getMapMarkersHelper();
 		helper.updateGroups();
-		List<MapMarkersGroup> groups = new ArrayList<>(helper.getMapMarkersGroups());
+		List<MapMarkersGroup> groups = new ArrayList<>(helper.getVisibleMapMarkersGroups());
 		groups.addAll(helper.getGroupsForDisplayedGpx());
 		groups.addAll(helper.getGroupsForSavedArticlesTravelBook());
 
@@ -135,9 +135,6 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 		for (int i = 0; i < groups.size(); i++) {
 			MapMarkersGroup group = groups.get(i);
-			if (!group.isVisible()) {
-				continue;
-			}
 			String markerGroupName = group.getName();
 
 			if (markerGroupName == null) {
@@ -189,8 +186,7 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 					items.add(marker);
 				}
 			} else {
-				GroupHeader header = group.getGroupHeader();
-				items.add(header);
+				items.add(new GroupHeader(group));
 				if (!group.isDisabled()) {
 					if (group.getWptCategories() != null && !group.getWptCategories().isEmpty()) {
 						CategoriesSubHeader categoriesSubHeader = new CategoriesSubHeader(group);
@@ -252,12 +248,19 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 	}
 
 	public int getGroupHeaderPosition(String groupId) {
-		int pos = -1;
-		MapMarkersGroup group = app.getMapMarkersHelper().getMapMarkerGroupById(groupId, MapMarkersGroup.ANY_TYPE); 
+		MapMarkersGroup group = app.getMapMarkersHelper().getMapMarkerGroupById(groupId, ItineraryType.MARKERS);
 		if (group != null) {
-			pos = items.indexOf(group.getGroupHeader());
+			for (int i = 0; i < items.size(); i++) {
+				Object item = items.get(i);
+				if (item instanceof GroupHeader) {
+					GroupHeader header = (GroupHeader) item;
+					if (Algorithms.stringsEqual(header.getGroup().getId(), groupId)) {
+						return i;
+					}
+				}
+			}
 		}
-		return pos;
+		return -1;
 	}
 
 	public void updateDisplayedData() {
@@ -425,7 +428,7 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 				String groupName = group.getName();
 				if (groupName.isEmpty()) {
 					groupName = app.getString(R.string.shared_string_favorites);
-				} else if (group.getType() == MapMarkersGroup.GPX_TYPE) {
+				} else if (group.getType() == ItineraryType.TRACK) {
 					groupName = groupName.replace(IndexConstants.GPX_FILE_EXT, "").replace("/", " ").replace("_", " ");
 				}
 				if (group.isDisabled()) {
@@ -483,7 +486,7 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 							fragment.show(mapActivity.getSupportFragmentManager(), SelectWptCategoriesBottomSheetDialogFragment.TAG);
 						}
 						mapMarkersHelper.updateGroupDisabled(group, disabled);
-						if (group.getType() == MapMarkersGroup.GPX_TYPE) {
+						if (group.getType() == ItineraryType.TRACK) {
 							group.setVisibleUntilRestart(disabled);
 							String gpxPath = group.getGpxPath();
 							SelectedGpxFile selectedGpxFile = app.getSelectedGpxHelper().getSelectedFileByPath(gpxPath);
@@ -506,7 +509,7 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 									.setAction(R.string.shared_string_undo, new View.OnClickListener() {
 										@Override
 										public void onClick(View view) {
-											if (group.getType() == MapMarkersGroup.GPX_TYPE && gpxFile[0] != null) {
+											if (group.getType() == ItineraryType.TRACK && gpxFile[0] != null) {
 												switchGpxVisibility(gpxFile[0], null, true);
 											}
 											mapMarkersHelper.enableGroup(group);
@@ -600,7 +603,7 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 			while (it.hasNext()) {
 				String category = it.next();
 				if (category.isEmpty()) {
-					category = app.getResources().getString(R.string.shared_string_waypoints);
+					category = app.getString(R.string.shared_string_waypoints);
 				}
 				sb.append(category);
 				if (it.hasNext()) {
@@ -616,7 +619,7 @@ public class MapMarkersGroupsAdapter extends RecyclerView.Adapter<RecyclerView.V
 		Object item = items.get(position);
 		if (item instanceof MapMarker) {
 			return MARKER_TYPE;
-		} else if (item instanceof GroupHeader || item instanceof Integer) {
+		} else if (item instanceof GroupHeader || item instanceof MarkerGroupItem) {
 			return HEADER_TYPE;
 		} else if (item instanceof ShowHideHistoryButton) {
 			return SHOW_HIDE_HISTORY_TYPE;
